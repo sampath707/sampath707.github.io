@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Printify Check – PDF Preflight & Fixes (2025)</title>
+    <meta name="description" content="Printify Check is an open-source PDF preflight and fix tool with 58+ checks, 25+ auto fixes, OCR, redaction. Free for individuals and teams." />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Outfit:wght@700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+
+
+
+    <style>
+        /* --- Variables --- */
+        :root {
+            --color-primary: #1e3a8a; /* Deep Blue */
+            --color-secondary: #f97316; /* Orange */
+            --color-accent: #10b981; /* Teal Green */
+            --color-danger: #dc2626; /* Red */
+            --color-warning: #facc15; /* Yellow */
+
+            --color-text-dark: #1f2937; /* Dark Slate */
+            --color-text-medium: #4b5563; /* Slate Grey */
+            --color-text-light: #f3f4f6; /* Off-White */
+            --color-background: #f3f4f6; /* Light Grey Background */
+            --color-card: #ffffff; /* White Card */
+
+            --space-xs: 0.5rem; /* 8px */
+            --space-sm: 0.75rem; /* 12px */
+            --space-md: 1rem; /* 16px */
+            --space-lg: 1.5rem; /* 24px */
+            --space-xl: 2.5rem; /* 40px */
+            --space-xxl: 4rem; /* 64px */
+
+            --section-padding: var(--space-xxl) 0;
+
+
+            --border-radius-sm: 0.25rem;
+            --border-radius-md: 0.5rem;
+            --border-radius-lg: 0.75rem;
+            --border-radius-pill: 9999px;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 5px 10px 0 rgba(0, 0, 0, 0.12);
+        }
+
+        /* --- Base Styles --- */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            color: var(--color-text-medium);
+            background-color: var(--color-background);
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            color: var(--color-text-dark);
+        }
+        h1 {
+            font-size: clamp(3rem, 8vw, 4rem);
+            font-weight: 900;
+            color: var(--color-text-dark);
+        }
+        h2 {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 900;
+            margin-bottom: var(--space-lg);
+            text-align: center;
+            color: var(--color-primary);
+        }
+         h3 {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: 700;
+            margin-bottom: var(--space-xs);
+            color: var(--color-primary);
+         }
+        p {
+            margin-bottom: var(--space-md);
+            font-size: 1rem;
+             color: var(--color-text-medium);
+        }
+        a {
+            color: var(--color-primary);
+            text-decoration: none;
+            transition: color 0.2s ease-in-out;
+        }
+        a:hover {
+            color: var(--color-secondary);
+            text-decoration: underline;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-md);
+        }
+        section {
+            padding: var(--section-padding);
+            position: relative;
+            overflow: hidden;
+        }
+         section:nth-of-type(even) {
+             background-color: #fff;
+         }
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--color-secondary);
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--border-radius-pill);
+            text-decoration: none;
+            transition: all 0.3s ease-in-out;
+            border: none;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+             outline: none;
+             gap: var(--space-xs);
+        }
+         .btn:hover, .btn:focus-visible {
+             background-color: #e26207;
+             box-shadow: var(--shadow-lg);
+             transform: translateY(-2px);
+              outline: 3px solid var(--color-accent);
+              outline-offset: 3px;
+         }
+         .btn-primary {
+             background-color: var(--color-primary);
+             box-shadow: 0 4px 10px rgba(30, 58, 138, 0.3);
+         }
+         .btn-primary:hover, .btn-primary:focus-visible {
+             background-color: #1a2e6b;
+             box-shadow: 0 6px 15px rgba(30, 58, 138, 0.4);
+             outline-color: var(--color-secondary);
+         }
+
+
+        /* --- Hero Section --- */
+        .hero {
+            background: linear-gradient(180deg, var(--color-background) 0%, #e0e7ff 100%);
+            text-align: center;
+            padding: var(--space-xxl) 0;
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+         .hero-content {
+             position: relative;
+             z-index: 1;
+             max-width: 900px;
+        }
+        .hero h1 {
+            margin-bottom: var(--space-md);
+        }
+        .hero p {
+            font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+            font-weight: 400;
+            max-width: 700px;
+            margin: 0 auto var(--space-xl);
+            color: var(--color-text-dark);
+        }
+         .hero .btn {
+             font-size: 1.1rem;
+             padding: var(--space-md) var(--space-lg);
+         }
+
+
+        /* --- Problem/Solution/Features Sections --- */
+        .section-title {
+            text-align: center;
+             margin-bottom: var(--space-xl);
+        }
+         .section-title h2 {
+             margin-bottom: var(--space-sm);
+             color: var(--color-primary);
+         }
+         .section-title p {
+             max-width: 800px;
+             margin: 0 auto;
+             font-size: 1rem;
+             color: var(--color-text-medium);
+         }
+
+
+        /* Problem & Solution Grid (Compact Presentation) */
+        .info-grid-compact {
+             display: grid;
+             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+             gap: var(--space-lg);
+             margin-top: var(--space-lg);
+        }
+        .info-item-compact {
+            text-align: center;
+        }
+        .info-item-compact .icon {
+            font-size: var(--space-xl);
+            color: var(--color-primary);
+            margin-bottom: var(--space-sm);
+        }
+        .info-item-compact h3 {
+            margin-top: 0;
+            font-size: 1.1rem;
+             color: var(--color-text-dark);
+        }
+        .info-item-compact p {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+            color: var(--color-text-medium);
+        }
+        /* Problem specific icon colors */
+        .problem .info-item-compact .icon { color: var(--color-secondary); }
+
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Default responsive grid */
+            gap: var(--space-lg);
+            margin-top: var(--space-lg);
+        }
+
+        /* 4 columns on wider screens */
+        @media (min-width: 992px) {
+             .features-grid {
+                grid-template-columns: repeat(4, 1fr);
+                 gap: var(--space-md);
+            }
+             .feature-card-compact {
+                 padding: var(--space-md);
+             }
+             .feature-card-compact .icon {
+                 font-size: var(--space-lg);
+                 margin-bottom: var(--space-sm);
+             }
+              .feature-card-compact h3 {
+                 font-size: 1.1rem;
+              }
+              .feature-card-compact p {
+                 font-size: 0.9rem;
+              }
+        }
+
+
+        .feature-card-compact {
+            background-color: var(--color-card);
+            padding: var(--space-lg);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            text-align: left;
+            border-left: 5px solid var(--color-accent);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+         .feature-card-compact:hover {
+             transform: translateY(-3px);
+             box-shadow: var(--shadow-lg);
+         }
+
+        .feature-card-compact .icon {
+            font-size: var(--space-xl);
+            color: var(--color-accent);
+            margin-bottom: var(--space-md);
+        }
+        .feature-card-compact h3 {
+            margin-top: 0;
+            color: var(--color-text-dark);
+            font-size: 1.2rem;
+         }
+         .feature-card-compact p {
+             margin-bottom: 0;
+             font-size: 0.95rem;
+             color: var(--color-text-medium);
+         }
+
+
+        /* --- Comparison Table --- */
+        .comparison h2 {
+             color: var(--color-primary);
+        }
+        .comparison-wrapper {
+            overflow-x: auto;
+            margin-top: var(--space-lg);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            background-color: var(--color-card);
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+            font-size: 0.95rem;
+            border-radius: var(--border-radius-lg);
+             overflow: hidden;
+        }
+        .comparison-table th, .comparison-table td {
+            padding: var(--space-sm) var(--space-md);
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+             vertical-align: middle;
+        }
+        .comparison-table th {
+            background-color: var(--color-primary);
+            color: var(--color-text-light);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            position: sticky;
+            top: 0;
+        }
+         .comparison-table td {
+             color: var(--color-text-dark);
+             font-size: 0.9rem;
+         }
+
+        .comparison-table tbody tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+         .comparison-table tbody tr:hover {
+             background-color: #e0e7ff;
+         }
+
+        .comparison-table td strong {
+            color: var(--color-primary);
+        }
+         .comparison-table td .fas.fa-check-circle { color: var(--color-accent); }
+         .comparison-table td .fas.fa-times-circle { color: var(--color-secondary); }
+
+
+        /* --- Signup Section --- */
+        .signup {
+            background-color: var(--color-primary);
+            color: var(--color-text-light);
+            padding: var(--space-xxl) 0;
+            text-align: center;
+             position: relative;
+             overflow: hidden;
+        }
+         .signup-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        .signup h2 {
+            color: #fff;
+            margin-bottom: var(--space-md);
+        }
+        .signup p {
+            font-size: 1.1rem;
+            margin-bottom: var(--space-lg);
+             color: rgba(255,255,255, 0.9);
+        }
+        .signup form {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+             max-width: 500px; /* Keep form max width */
+             margin: 0 auto;
+        }
+
+        /* --- Style for Inputs and Select --- */
+        .signup form input[type="email"],
+        .signup form select { /* Apply these styles to both input and select */
+            flex-grow: 1;
+            min-width: 250px;
+            padding: var(--space-md) var(--space-lg);
+            font-size: 1rem;
+            border-radius: var(--border-radius-pill);
+            border: 2px solid transparent;
+            outline: none;
+            transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            font-family: 'Inter', sans-serif;
+             background-color: #fff;
+             color: var(--color-text-dark);
+             cursor: text; /* Default cursor for input */
+        }
+
+        /* --- Specific Select Styling to remove default appearance and add custom arrow --- */
+        .signup form select {
+             -webkit-appearance: none; /* Remove default browser styling */
+             -moz-appearance: none;
+             appearance: none;
+             /* Custom SVG arrow color matches --color-primary #1e3a8a */
+             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231e3a8a%22%20d%3D%22M287%2069.3a17.6%2017.6%200%200%200-13.4-5.7H18.3c-5.4%200-10.5%202.1-14.3%205.7L0%2082.8l146.2%20146.2%20146.2-146.2z%22%2F%3E%3C%2Fsvg%3E');
+             background-repeat: no-repeat;
+             background-position: right var(--space-md) center; /* Position the arrow */
+             background-size: 0.8em auto; /* Size the arrow relative to font-size */
+             padding-right: calc(var(--space-lg) + 1.5em); /* Add padding to the right for the arrow */
+             cursor: pointer; /* Indicate it's interactive */
+        }
+
+        /* Style for placeholder option */
+        .signup form select option[value=""]:disabled {
+            color: var(--color-text-medium); /* Placeholder color */
+        }
+         /* --- End Specific Select Styling --- */
+
+
+        .signup input[type="email"]:focus,
+        .signup select:focus { /* Apply focus style to both input and select */
+            border-color: var(--color-accent);
+             box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        .signup .btn {
+            background-color: var(--color-secondary);
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+             padding: var(--space-md) var(--space-lg);
+        }
+         .signup .btn:hover, .signup .btn:focus-visible {
+             background-color: #e26207;
+             outline-color: var(--color-text-light);
+         }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--color-text-dark);
+            color: var(--color-text-medium);
+            text-align: center;
+            padding: var(--space-lg) var(--space-md);
+            font-size: 0.85rem;
+        }
+        footer a {
+            color: var(--color-accent);
+            text-decoration: none;
+            transition: color 0.2s ease-in-out;
+        }
+        footer a:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 991.98px) { /* Below desktop width */
+             .features-grid { /* Revert to responsive grid below 992px */
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                 gap: var(--space-md);
+                 margin-top: var(--space-lg);
+            }
+             .feature-card-compact { /* Revert padding/icon size below 992px */
+                 padding: var(--space-md);
+             }
+             .feature-card-compact .icon {
+                font-size: var(--space-lg);
+                margin-bottom: var(--space-sm);
+             }
+              .feature-card-compact h3 { font-size: 1.1rem; }
+              .feature-card-compact p { font-size: 0.9rem; }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: clamp(2.2rem, 10vw, 3rem); }
+            h2 { font-size: clamp(1.6rem, 6vw, 2rem); }
+             h3 { font-size: clamp(1.2rem, 5vw, 1.5rem); }
+             p { font-size: 0.95rem; }
+
+             section { padding: var(--space-xl) 0; }
+
+             .hero { min-height: 60vh; padding: var(--space-xl) 0; }
+              .hero p { font-size: clamp(0.95rem, 3vw, 1.1rem); margin-bottom: var(--space-lg); }
+              .hero .btn { font-size: 1rem; padding: var(--space-sm) var(--space-md); }
+
+            .section-title { margin-bottom: var(--space-lg); }
+            .section-title h2 { margin-bottom: var(--space-sm); }
+             .section-title p { font-size: 0.9rem; }
+
+            .info-grid-compact { /* Corrected class name */
+                gap: var(--space-md);
+                 margin-top: var(--space-lg);
+            }
+             .info-item-compact .icon { font-size: var(--space-xl); }
+             .info-item-compact h3 { font-size: 1.05rem; }
+             .info-item-compact p { font-size: 0.85rem; }
+
+            .comparison-table th, .comparison-table td { padding: var(--space-sm) var(--space-md); font-size: 0.8em;}
+
+             .signup h2 { font-size: clamp(1.6rem, 6vw, 2rem); margin-bottom: var(--space-sm); }
+             .signup p { font-size: 1rem; margin-bottom: var(--space-md); }
+
+             .signup form input[type="email"],
+             .signup form select, /* Apply responsive width to select too */
+             .signup form .btn {
+                 width: 100%;
+                 max-width: 300px;
+                 padding: var(--space-sm) var(--space-md);
+                 font-size: 1rem;
+             }
+             .signup form select { /* Adjust responsive padding for arrow */
+                 padding-right: calc(var(--space-md) + 1.5em);
+             }
+             .signup form { /* Corrected class name */
+                 flex-direction: column;
+                 align-items: center;
+                 gap: var(--space-sm);
+             }
+        }
+
+         @media (max-width: 480px) {
+             h1 { font-size: clamp(1.8rem, 12vw, 2.5rem); }
+              h2 { font-size: clamp(1.5rem, 8vw, 1.8rem); }
+              .hero { padding: var(--space-xl) 0; min-height: 50vh; }
+               .hero p { font-size: 0.95rem; margin-bottom: var(--space-md); }
+               .hero .btn { font-size: 0.95rem; padding: var(--space-xs) var(--space-sm); font-size: 0.95rem;}
+
+              section { padding: var(--space-lg) 0; }
+
+              .section-title { margin-bottom: var(--space-md); }
+
+              .info-grid-compact, .features-grid { gap: var(--space-md); margin-top: var(--space-md); } /* Corrected class name */
+              .info-item-compact .icon { font-size: var(--space-lg); }
+               .info-item-compact h3 { font-size: 1rem; }
+                .info-item-compact p { font-size: 0.8rem; }
+
+               .comparison-table th, .comparison-table td { padding: var(--space-sm) var(--space-sm); font-size: 0.75em;}
+
+                .signup h2 { font-size: clamp(1.5rem, 8vw, 1.8rem); }
+                .signup p { font-size: 0.9rem; margin-bottom: var(--space-sm); }
+                .signup form input[type="email"],
+                .signup form select, /* Apply mobile width to select too */
+                .signup form .btn { padding: var(--space-xs) var(--space-sm); font-size: 0.9rem;}
+                 .signup form select { /* Adjust mobile padding for arrow */
+                     padding-right: calc(var(--space-sm) + 1.5em);
+                 }
+         }
+
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Printify Check</h1>
+                <p>
+                    The modern, open-source solution for PDF preflight, fixes, OCR, and redaction. Streamline your workflows for free.
+                </p>
+                <a href="#signup" class="btn btn-primary" role="button" aria-label="Get Early Access to Printify Check Waitlist">Get Early Access Now</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="problem info-section" aria-labelledby="problem-title">
+        <div class="container">
+            <div class="section-title">
+                <h2 id="problem-title">Outdated PDF Workflows Cost You</h2>
+                 <p>Traditional tools are expensive, complex, and lack features needed today. Dealing with faulty print files, inaccessible scans, or sensitive data shouldn't be painful.</p>
+            </div>
+            <div class="info-grid-compact">
+                <div class="info-item-compact">
+                    <div class="icon"><i class="fas fa-dollar-sign" aria-hidden="true"></i></div>
+                    <h3>High Costs</h3>
+                    <p>Expensive licenses ($15–$125/mo) exclude small teams.</p>
+                </div>
+                 <div class="info-item-compact">
+                    <div class="icon"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i></div>
+                    <h3>Complex UX</h3>
+                    <p>Steep learning curve and wasted time training staff.</p>
+                </div>
+                 <div class="info-item-compact">
+                    <div class="icon"><i class="fas fa-file-image" aria-hidden="true"></i></div>
+                    <h3>No OCR</h3>
+                    <p>Many tools can't process scanned PDFs effectively.</p>
+                </div>
+                 <div class="info-item-compact">
+                    <div class="icon"><i class="fas fa-lock" aria-hidden="true"></i></div>
+                    <h3>No Redaction</h3>
+                    <p>Privacy and compliance risks.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+     <section class="solution info-section" aria-labelledby="solution-title">
+        <div class="container">
+             <div class="section-title">
+                <h2 id="solution-title">Printify Check Solves This</h2>
+                 <p>Built for efficiency and accessibility, bringing powerful PDF capabilities to your browser. Free for individuals, affordable for teams.</p>
+             </div>
+            <div class="info-grid-compact">
+                <div class="info-item-compact">
+                    <div class="icon"><i class="fas fa-check-circle" aria-hidden="true"></i></div>
+                    <h3>58+ Checks</h3>
+                    <p>Comprehensive preflight analysis.</p>
+                </div>
+                 <div class="info-item-compact">
+                    <div class="icon"><i class="fas fa-tools" aria-hidden="true"></i></div>
+                    <h3>25+ Fixes</h3>
+                    <p>Instantly resolve common PDF issues.</p>
+                </div>
+                 <div class="info-item-compact">
+                    <div class="icon"><i class="fas fa-users" aria-hidden="true"></i></div>
+                    <h3>Open-Source</h3>
+                    <p>Transparent, secure, community-driven (AGPL).</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" aria-labelledby="features-title">
+        <div class="container">
+            <div class="section-title">
+                 <h2 id="features-title">Key Capabilities</h2>
+                 <p>Everything you need to ensure perfect, compliant, and secure PDF files, right in your web browser.</p>
+            </div>
+            <div class="features-grid" role="list">
+                <div class="feature-card-compact" role="listitem">
+                    <div class="icon"><i class="fas fa-magnifying-glass-chart" aria-hidden="true"></i></div>
+                    <h3>Advanced Preflight</h3>
+                    <p>Examine XREF tables, fonts, ICC profiles, DPI, bleeds, PDF/A/X/UA compliance.</p>
+                </div>
+                <div class="feature-card-compact" role="listitem">
+                    <div class="icon"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i></div>
+                    <h3>One-Click Fixes</h3>
+                    <p>Embed fonts, convert to CMYK, add bleeds, flatten transparency, and more.</p>
+                </div>
+                <div class="feature-card-compact" role="listitem">
+                    <div class="icon"><i class="fas fa-file-alt" aria-hidden="true"></i></div>
+                    <h3>OCR & Search</h3>
+                    <p>Transform scans into searchable text with Tesseract-powered OCR.</p>
+                </div>
+                <div class="feature-card-compact" role="listitem">
+                    <div class="icon"><i class="fas fa-user-shield" aria-hidden="true"></i></div>
+                    <h3>Secure Redaction</h3>
+                    <p>Remove sensitive data, metadata, and hidden layers permanently.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="comparison" aria-labelledby="comparison-title">
+        <div class="container">
+             <div class="section-title">
+                <h2 id="comparison-title">Printify Check vs. Competition (2025)</h2>
+                 <p>See how Printify Check stacks up against traditional, often expensive, alternatives.</p>
+             </div>
+            <div class="comparison-wrapper">
+                <table class="comparison-table" role="table" aria-describedby="comparison-title">
+                    <thead>
+                        <tr>
+                            <th scope="col">Product</th>
+                            <th scope="col">Cost (Approx.)</th>
+                            <th scope="col">Advanced Checks</th>
+                            <th scope="col">Automated Fixes</th>
+                            <th scope="col">Integrated OCR</th>
+                            <th scope="col">Robust Redaction</th>
+                            <th scope="col">Platform</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Printify Check</strong></td>
+                            <td>Free / $10–69/mo</td>
+                            <td>58+</td>
+                            <td>25+</td>
+                            <td><i class="fas fa-check-circle" aria-label="Yes"></i></td>
+                            <td><i class="fas fa-check-circle" aria-label="Yes"></i></td>
+                            <td>Web (Browser)</td>
+                        </tr>
+                        <tr>
+                            <td>Adobe Acrobat Pro DC</td>
+                            <td>$19.99/mo (Annual)</td>
+                            <td>Moderate</td>
+                            <td>Moderate</td>
+                            <td><i class="fas fa-check-circle" aria-label="Yes"></i></td>
+                            <td><i class="fas fa-check-circle" aria-label="Yes"></i></td>
+                            <td>Desktop, Web, Mobile</td>
+                        </tr>
+                        <tr>
+                            <td>Enfocus PitStop Pro</td>
+                            <td>$699 one-time / ~$40+/mo sub</td>
+                            <td>200+</td>
+                            <td>100+</td>
+                            <td><i class="fas fa-times-circle" aria-label="No"></i></td>
+                            <td>Limited</td>
+                            <td>Plugin (Acrobat), Desktop</td>
+                        </tr>
+                        <tr>
+                            <td>callas pdfToolbox</td>
+                            <td>~$670 one-time (Desktop)</td>
+                            <td>300+</td>
+                            <td>100+</td>
+                            <td>Limited</td>
+                            <td><i class="fas fa-check-circle" aria-label="Yes"></i></td>
+                            <td>Desktop, Server, CLI</td>
+                        </tr>
+                        <tr>
+                            <td>Markzware FlightCheck</td>
+                            <td>$399 one-time / $249/year</td>
+                            <td>Moderate</td>
+                            <td>Basic</td>
+                            <td><i class="fas fa-times-circle" aria-label="No"></i></td>
+                            <td><i class="fas fa-times-circle" aria-label="No"></i></td>
+                            <td>Desktop (Mac)</td>
+                        </tr>
+                         <tr>
+                            <td>Smallpdf Pro</td>
+                            <td>~$9/mo</td>
+                            <td>Basic</td>
+                            <td>Basic</td>
+                            <td><i class="fas fa-check-circle" aria-label="Yes"></i></td>
+                            <td>Basic</td>
+                            <td>Web, Desktop</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+
+
+<section class="signup" id="signup" aria-labelledby="signup-title">
+    <div class="container">
+        <div class="signup-content">
+            <h2 id="signup-title">Get Early Access</h2>
+            <p>Join our waitlist today for exclusive early access, special launch perks, and be the first to know when Printify Check is live!</p>
+            <form autocomplete="off">
+                <label for="email" class="visually-hidden">Your Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email address" required aria-label="Email address for waitlist" />
+
+                <label for="country" class="visually-hidden">Your Country</label>
+                <select id="country" name="country" required aria-label="Select your country">
+                    <option value="" disabled selected>Select Country</option>
+                    <option value="AF">Afghanistan</option>
+                    <option value="AL">Albania</option>
+                    <option value="DZ">Algeria</option>
+                    <option value="AS">American Samoa</option>
+                    <option value="AD">Andorra</option>
+                    <option value="AO">Angola</option>
+                    <option value="AI">Anguilla</option>
+                    <option value="AQ">Antarctica</option>
+                    <option value="AG">Antigua and Barbuda</option>
+                    <option value="AR">Argentina</option>
+                    <option value="AM">Armenia</option>
+                    <option value="AW">Aruba</option>
+                    <option value="AU">Australia</option>
+                    <option value="AT">Austria</option>
+                    <option value="AZ">Azerbaijan</option>
+                    <option value="BS">Bahamas</option>
+                    <option value="BH">Bahrain</option>
+                    <option value="BD">Bangladesh</option>
+                    <option value="BB">Barbados</option>
+                    <option value="BY">Belarus</option>
+                    <option value="BE">Belgium</option>
+                    <option value="BZ">Belize</option>
+                    <option value="BJ">Benin</option>
+                    <option value="BM">Bermuda</option>
+                    <option value="BT">Bhutan</option>
+                    <option value="BO">Bolivia (Plurinational State of)</option>
+                    <option value="BQ">Bonaire, Sint Eustatius and Saba</option>
+                    <option value="BA">Bosnia and Herzegovina</option>
+                    <option value="BW">Botswana</option>
+                    <option value="BV">Bouvet Island</option>
+                    <option value="BR">Brazil</option>
+                    <option value="IO">British Indian Ocean Territory</option>
+                    <option value="BN">Brunei Darussalam</option>
+                    <option value="BG">Bulgaria</option>
+                    <option value="BF">Burkina Faso</option>
+                    <option value="BI">Burundi</option>
+                    <option value="CV">Cabo Verde</option>
+                    <option value="KH">Cambodia</option>
+                    <option value="CM">Cameroon</option>
+                    <option value="CA">Canada</option>
+                    <option value="KY">Cayman Islands</option>
+                    <option value="CF">Central African Republic</option>
+                    <option value="TD">Chad</option>
+                    <option value="CL">Chile</option>
+                    <option value="CN">China</option>
+                    <option value="CX">Christmas Island</option>
+                    <option value="CC">Cocos (Keeling) Islands</option>
+                    <option value="CO">Colombia</option>
+                    <option value="KM">Comoros</option>
+                    <option value="CG">Congo</option>
+                    <option value="CD">Congo (Democratic Republic of the)</option>
+                    <option value="CK">Cook Islands</option>
+                    <option value="CR">Costa Rica</option>
+                    <option value="CI">Côte d'Ivoire</option>
+                    <option value="HR">Croatia</option>
+                    <option value="CU">Cuba</option>
+                    <option value="CW">Curaçao</option>
+                    <option value="CY">Cyprus</option>
+                    <option value="CZ">Czechia</option>
+                    <option value="DK">Denmark</option>
+                    <option value="DJ">Djibouti</option>
+                    <option value="DM">Dominica</option>
+                    <option value="DO">Dominican Republic</option>
+                    <option value="EC">Ecuador</option>
+                    <option value="EG">Egypt</option>
+                    <option value="SV">El Salvador</option>
+                    <option value="GQ">Equatorial Guinea</option>
+                    <option value="ER">Eritrea</option>
+                    <option value="EE">Estonia</option>
+                    <option value="SZ">Eswatini</option>
+                    <option value="ET">Ethiopia</option>
+                    <option value="FK">Falkland Islands (Malvinas)</option>
+                    <option value="FO">Faroe Islands</option>
+                    <option value="FJ">Fiji</option>
+                    <option value="FI">Finland</option>
+                    <option value="FR">France</option>
+                    <option value="GF">French Guiana</option>
+                    <option value="PF">French Polynesia</option>
+                    <option value="TF">French Southern Territories</option>
+                    <option value="GA">Gabon</option>
+                    <option value="GM">Gambia</option>
+                    <option value="GE">Georgia</option>
+                    <option value="DE">Germany</option>
+                    <option value="GH">Ghana</option>
+                    <option value="GI">Gibraltar</option>
+                    <option value="GR">Greece</option>
+                    <option value="GL">Greenland</option>
+                    <option value="GD">Grenada</option>
+                    <option value="GP">Guadeloupe</option>
+                    <option value="GU">Guam</option>
+                    <option value="GT">Guatemala</option>
+                    <option value="GG">Guernsey</option>
+                    <option value="GN">Guinea</option>
+                    <option value="GW">Guinea-Bissau</option>
+                    <option value="GY">Guyana</option>
+                    <option value="HT">Haiti</option>
+                    <option value="HM">Heard Island and McDonald Islands</option>
+                    <option value="VA">Holy See</option>
+                    <option value="HN">Honduras</option>
+                    <option value="HK">Hong Kong</option>
+                    <option value="HU">Hungary</option>
+                    <option value="IS">Iceland</option>
+                    <option value="IN">India</option>
+                    <option value="ID">Indonesia</option>
+                    <option value="IR">Iran (Islamic Republic of)</option>
+                    <option value="IQ">Iraq</option>
+                    <option value="IE">Ireland</option>
+                    <option value="IM">Isle of Man</option>
+                    <option value="IL">Israel</option>
+                    <option value="IT">Italy</option>
+                    <option value="JM">Jamaica</option>
+                    <option value="JP">Japan</option>
+                    <option value="JE">Jersey</option>
+                    <option value="JO">Jordan</option>
+                    <option value="KZ">Kazakhstan</option>
+                    <option value="KE">Kenya</option>
+                    <option value="KI">Kiribati</option>
+                    <option value="KP">Korea (Democratic People's Republic of)</option>
+                    <option value="KR">Korea (Republic of)</option>
+                    <option value="KW">Kuwait</option>
+                    <option value="KG">Kyrgyzstan</option>
+                    <option value="LA">Lao People's Democratic Republic</option>
+                    <option value="LV">Latvia</option>
+                    <option value="LB">Lebanon</option>
+                    <option value="LS">Lesotho</option>
+                    <option value="LR">Liberia</option>
+                    <option value="LY">Libya</option>
+                    <option value="LI">Liechtenstein</option>
+                    <option value="LT">Lithuania</option>
+                    <option value="LU">Luxembourg</option>
+                    <option value="MO">Macao</option>
+                    <option value="MG">Madagascar</option>
+                    <option value="MW">Malawi</option>
+                    <option value="MV">Maldives</option>
+                    <option value="ML">Mali</option>
+                    <option value="MT">Malta</option>
+                    <option value="MH">Marshall Islands</option>
+                    <option value="MQ">Martinique</option>
+                    <option value="MR">Mauritania</option>
+                    <option value="MU">Mauritius</option>
+                    <option value="YT">Mayotte</option>
+                    <option value="MX">Mexico</option>
+                    <option value="FM">Micronesia (Federated States of)</option>
+                    <option value="MD">Moldova (Republic of)</option>
+                    <option value="MC">Monaco</option>
+                    <option value="MN">Mongolia</option>
+                    <option value="ME">Montenegro</option>
+                    <option value="MS">Montserrat</option>
+                    <option value="MA">Morocco</option>
+                    <option value="MZ">Mozambique</option>
+                    <option value="MM">Myanmar</option>
+                    <option value="NA">Namibia</option>
+                    <option value="NR">Nauru</option>
+                    <option value="NP">Nepal</option>
+                    <option value="NL">Netherlands</option>
+                    <option value="NC">New Caledonia</option>
+                    <option value="NZ">New Zealand</option>
+                    <option value="NI">Nicaragua</option>
+                    <option value="NE">Niger</option>
+                    <option value="NG">Nigeria</option>
+                    <option value="NU">Niue</option>
+                    <option value="NF">Norfolk Island</option>
+                    <option value="MK">North Macedonia</option>
+                    <option value="MP">Northern Mariana Islands</option>
+                    <option value="NO">Norway</option>
+                    <option value="OM">Oman</option>
+                    <option value="PK">Pakistan</option>
+                    <option value="PW">Palau</option>
+                    <option value="PS">Palestine, State of</option>
+                    <option value="PA">Panama</option>
+                    <option value="PG">Papua New Guinea</option>
+                    <option value="PY">Paraguay</option>
+                    <option value="PE">Peru</option>
+                    <option value="PH">Philippines</option>
+                    <option value="PN">Pitcairn</option>
+                    <option value="PL">Poland</option>
+                    <option value="PT">Portugal</option>
+                    <option value="PR">Puerto Rico</option>
+                    <option value="QA">Qatar</option>
+                    <option value="RE">Réunion</option>
+                    <option value="RO">Romania</option>
+                    <option value="RU">Russian Federation</option>
+                    <option value="RW">Rwanda</option>
+                    <option value="BL">Saint Barthélemy</option>
+                    <option value="SH">Saint Helena, Ascension and Tristan da Cunha</option>
+                    <option value="KN">Saint Kitts and Nevis</option>
+                    <option value="LC">Saint Lucia</option>
+                    <option value="MF">Saint Martin (French part)</option>
+                    <option value="PM">Saint Pierre and Miquelon</option>
+                    <option value="VC">Saint Vincent and the Grenadines</option>
+                    <option value="WS">Samoa</option>
+                    <option value="SM">San Marino</option>
+                    <option value="ST">Sao Tome and Principe</option>
+                    <option value="SA">Saudi Arabia</option>
+                    <option value="SN">Senegal</option>
+                    <option value="RS">Serbia</option>
+                    <option value="SC">Seychelles</option>
+                    <option value="SL">Sierra Leone</option>
+                    <option value="SG">Singapore</option>
+                    <option value="SX">Sint Maarten (Dutch part)</option>
+                    <option value="SK">Slovakia</option>
+                    <option value="SI">Slovenia</option>
+                    <option value="SB">Solomon Islands</option>
+                    <option value="SO">Somalia</option>
+                    <option value="ZA">South Africa</option>
+                    <option value="GS">South Georgia and the South Sandwich Islands</option>
+                    <option value="SS">South Sudan</option>
+                    <option value="ES">Spain</option>
+                    <option value="LK">Sri Lanka</option>
+                    <option value="SD">Sudan</option>
+                    <option value="SR">Suriname</option>
+                    <option value="SJ">Svalbard and Jan Mayen</option>
+                    <option value="SE">Sweden</option>
+                    <option value="CH">Switzerland</option>
+                    <option value="SY">Syrian Arab Republic</option>
+                    <option value="TW">Taiwan, Province of China</option>
+                    <option value="TJ">Tajikistan</option>
+                    <option value="TZ">Tanzania, United Republic of</option>
+                    <option value="TH">Thailand</option>
+                    <option value="TL">Timor-Leste</option>
+                    <option value="TG">Togo</option>
+                    <option value="TK">Tokelau</option>
+                    <option value="TO">Tonga</option>
+                    <option value="TT">Trinidad and Tobago</option>
+                    <option value="TN">Tunisia</option>
+                    <option value="TR">Turkey</option>
+                    <option value="TM">Turkmenistan</option>
+                    <option value="TC">Turks and Caicos Islands</option>
+                    <option value="TV">Tuvalu</option>
+                    <option value="UG">Uganda</option>
+                    <option value="UA">Ukraine</option>
+                    <option value="AE">United Arab Emirates</option>
+                    <option value="GB">United Kingdom of Great Britain and Northern Ireland</option>
+                    <option value="US">United States of America</option>
+                    <option value="UM">United States Minor Outlying Islands</option>
+                    <option value="UY">Uruguay</option>
+                    <option value="UZ">Uzbekistan</option>
+                    <option value="VU">Vanuatu</option>
+                    <option value="VE">Venezuela (Bolivarian Republic of)</option>
+                    <option value="VN">Viet Nam</option>
+                    <option value="VG">Virgin Islands (British)</option>
+                    <option value="VI">Virgin Islands (U.S.)</option>
+                    <option value="WF">Wallis and Futuna</option>
+                    <option value="EH">Western Sahara</option>
+                    <option value="YE">Yemen</option>
+                    <option value="ZM">Zambia</option>
+                    <option value="ZW">Zimbabwe</option>
+                </select>
+                <button type="submit" class="btn" aria-label="Join Waitlist Now">Join Waitlist</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+
+
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Printify Check &nbsp;|&nbsp; AGPLv3 Open-Source &nbsp;|&nbsp; <a href="https://github.com/your-repo" target="_blank" rel="noopener noreferrer">View on GitHub</a></p> </div>
+    </footer>
+
+     <script>
+        // Wait for the DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const signupForm = document.querySelector('#signup form');
+            const emailInput = document.getElementById('email');
+            // --- Get the country select element ---
+            const countrySelect = document.getElementById('country');
+            // --- End Get Element ---
+            const submitButton = signupForm.querySelector('button[type="submit"]');
+
+            // --- Replace with your Google Apps Script Web App URL ---
+            const googleAppsScriptURL = 'https://script.google.com/macros/s/AKfycbyoLg3cOi8osbTkowENPUQWdVi-g45ae6KRpSXVgSvbxYOW7rKNZ-bhipNY4_2simfKjw/exec';
+            // --- End of URL ---
+
+
+            if (signupForm && emailInput && countrySelect && submitButton && googleAppsScriptURL) {
+                signupForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+
+                    const email = emailInput.value;
+                    // --- Get the selected country value ---
+                    const country = countrySelect.value;
+                    // --- End Get Value ---
+
+                    // Basic validation (browser's `required` attribute handles most, but check JS too)
+                    if (!email || !country) {
+                        alert('Please fill out all required fields (Email and Country).');
+                        // Re-enable button in case it was disabled by a previous failed attempt
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Join Waitlist';
+                        return;
+                    }
+
+
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Sending...'; // Or change icon
+
+                    // Data to send (now includes country)
+                    const dataToSend = {
+                        email: email,
+                        // --- Add country to data ---
+                        country: country
+                        // --- End add country ---
+                        // If you added a security token in Apps Script, add it here:
+                        // token: 'YOUR_SECRET_TOKEN_HERE'
+                    };
+
+                    // --- Send data to Google Apps Script using fetch ---
+                    fetch(googleAppsScriptURL, {
+                        method: 'POST', // The Apps Script is listening for POST
+                        mode: 'cors',   // Required for browser-to-Apps Script communication
+                        headers: {
+                            'Content-Type': 'application/json' // Tell the server the data is JSON
+                        },
+                        body: JSON.stringify(dataToSend) // Send the data as a JSON string
+                    })
+                    .then(response => {
+                        // Check if the response is okay (status code 2xx)
+                        if (!response.ok) {
+                            // Handle HTTP errors
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        // Parse the JSON response from the Apps Script (if it sent one)
+                        return response.json();
+                    })
+                    .then(result => {
+                        // Handle the success/failure response from your Apps Script
+                        console.log('Apps Script Response:', result); // Log the response
+
+                        if (result.success) {
+                            // Success! Show a thank you message
+                            signupForm.innerHTML = '<h3>Thank You!</h3><p>You\'ve been added to the waitlist.</p>'; // Replace form
+                        } else {
+                            // Apps Script returned a specific error message
+                            alert('Signup failed: ' + (result.message || 'Unknown error'));
+                            // Re-enable button
+                            submitButton.disabled = false;
+                            submitButton.textContent = 'Join Waitlist';
+                        }
+                    })
+                    .catch((error) => {
+                        // Handle network errors or errors thrown above
+                        console.error('Fetch error:', error);
+                        alert('Oops! Something went wrong submitting the form.');
+                        // Re-enable button
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Join Waitlist';
+                    });
+                    // --- End fetch ---
+                });
+            } else {
+                console.error('Required form elements or Apps Script URL not found.');
+                // Optional: show a message on the page if the form can't work
+                if (signupForm) {
+                   signupForm.innerHTML = '<p style="color: red;">Waitlist form is currently unavailable. Please try again later.</p>';
+                }
+            }
+        });
+    </script>
+
+     <script>
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                const offsetTop = targetElement.getBoundingClientRect().top + window.pageYOffset;
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+   </script>
+
+</body>
+</html>
