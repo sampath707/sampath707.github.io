@@ -1011,122 +1011,68 @@
             <p>&copy; 2025 Printify Check &nbsp;|&nbsp; AGPLv3 Open-Source &nbsp;|&nbsp; <a href="https://github.com/your-repo" target="_blank" rel="noopener noreferrer">View on GitHub</a></p> </div>
     </footer>
 
-     <script>
-        // Wait for the DOM to be fully loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            const signupForm = document.querySelector('#signup form');
-            const emailInput = document.getElementById('email');
-            // --- Get the country select element ---
-            const countrySelect = document.getElementById('country');
-            // --- End Get Element ---
-            const submitButton = signupForm.querySelector('button[type="submit"]');
+     
 
-            // --- Replace with your Google Apps Script Web App URL ---
-            const googleAppsScriptURL = 'https://script.google.com/macros/s/AKfycby0TxAqg9_iZ1DMDo8uEX0PRJ5FFKdzOuj_XEX6qgS6uWYzjbgGqWnyJRvykkEtfEzo8g/exec';
-            // --- End of URL ---
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const signupForm = document.querySelector('#signup form');
+    const emailInput = document.getElementById('email');
+    const countrySelect = document.getElementById('country');
+    const submitButton = signupForm.querySelector('button[type="submit"]');
 
+    const googleAppsScriptURL = 'https://script.google.com/macros/s/AKfycbzIUhcndYcNheULqx0Rnor0syFXvrWOMe2ixXcuUPTppCWhsmRh1_TldbLoggw5j1w2/exec'; // REPLACE THIS with your deployed URL
 
-            if (signupForm && emailInput && countrySelect && submitButton && googleAppsScriptURL) {
-                signupForm.addEventListener('submit', function(event) {
-                    event.preventDefault();
+    signupForm.addEventListener('submit', function (event) {
+      event.preventDefault();
 
-                    const email = emailInput.value;
-                    // --- Get the selected country value ---
-                    const country = countrySelect.value;
-                    // --- End Get Value ---
+      const email = emailInput.value;
+      const country = countrySelect.value;
 
-                    // Basic validation (browser's `required` attribute handles most, but check JS too)
-                    if (!email || !country) {
-                        alert('Please fill out all required fields (Email and Country).');
-                        // Re-enable button in case it was disabled by a previous failed attempt
-                        submitButton.disabled = false;
-                        submitButton.textContent = 'Join Waitlist';
-                        return;
-                    }
+      if (!email || !country) {
+        alert('Please fill out all required fields.');
+        return;
+      }
 
+      submitButton.disabled = true;
+      submitButton.textContent = 'Sending...';
 
-                    submitButton.disabled = true;
-                    submitButton.textContent = 'Sending...'; // Or change icon
+      const dataToSend = {
+        email: email,
+        country: country,
+        token: 'sampath@123' // Must match the token in your Apps Script
+      };
 
-                    // Data to send (now includes country)
-                    const dataToSend = {
-                        email: email,
-                        // --- Add country to data ---
-                        country: country,
-                        // --- End add country ---
-                        // If you added a security token in Apps Script, add it here:
-                         token: 'sampath@123'
-                    };
-
-                    // --- Send data to Google Apps Script using fetch ---
-                    fetch(googleAppsScriptURL, {
-                        method: 'POST', // The Apps Script is listening for POST
-                        mode: 'cors',   // Required for browser-to-Apps Script communication
-                        headers: {
-                            'Content-Type': 'application/json' // Tell the server the data is JSON
-                        },
-                        body: JSON.stringify(dataToSend) // Send the data as a JSON string
-                    })
-                    .then(response => {
-                        // Check if the response is okay (status code 2xx)
-                        if (!response.ok) {
-                            // Handle HTTP errors
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        // Parse the JSON response from the Apps Script (if it sent one)
-                        return response.json();
-                    })
-                    .then(result => {
-                        // Handle the success/failure response from your Apps Script
-                        console.log('Apps Script Response:', result); // Log the response
-
-                        if (result.success) {
-                            // Success! Show a thank you message
-                            signupForm.innerHTML = '<h3>Thank You!</h3><p>You\'ve been added to the waitlist.</p>'; // Replace form
-                        } else {
-                            // Apps Script returned a specific error message
-                            alert('Signup failed: ' + (result.message || 'Unknown error'));
-                            // Re-enable button
-                            submitButton.disabled = false;
-                            submitButton.textContent = 'Join Waitlist';
-                        }
-                    })
-                    .catch((error) => {
-                        // Handle network errors or errors thrown above
-                        console.error('Fetch error:', error);
-                        alert('Oops! Something went wrong submitting the form.');
-                        // Re-enable button
-                        submitButton.disabled = false;
-                        submitButton.textContent = 'Join Waitlist';
-                    });
-                    // --- End fetch ---
-                });
-            } else {
-                console.error('Required form elements or Apps Script URL not found.');
-                // Optional: show a message on the page if the form can't work
-                if (signupForm) {
-                   signupForm.innerHTML = '<p style="color: red;">Waitlist form is currently unavailable. Please try again later.</p>';
-                }
-            }
-        });
-    </script>
-
-     <script>
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-                const offsetTop = targetElement.getBoundingClientRect().top + window.pageYOffset;
-                window.scrollTo({
-                    top: offsetTop,
-                    behavior: 'smooth'
-                });
-            }
-        });
+      fetch(googleAppsScriptURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataToSend)
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          signupForm.innerHTML = '<h3>Thank You!</h3><p>You\'ve been added to the waitlist.</p>';
+        } else {
+          alert('Signup failed: ' + (result.message || 'Unknown error'));
+          submitButton.disabled = false;
+          submitButton.textContent = 'Join Waitlist';
+        }
+      })
+      .catch((error) => {
+        console.error('Fetch error:', error);
+        alert('Oops! Something went wrong.');
+        submitButton.disabled = false;
+        submitButton.textContent = 'Join Waitlist';
+      });
     });
-   </script>
+  });
+</script>
+
+
+
+
+
 
 </body>
 </html>
