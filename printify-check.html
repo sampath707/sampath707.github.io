@@ -1017,15 +1017,15 @@
      
 
 <script>
-
-
 document.addEventListener("DOMContentLoaded", function() {
-  const googleAppsScriptURL = 'https://script.google.com/macros/s/AKfycbxcKAkQS9Ru8Wjx5IPU9WukF_nfc86rh-iLJroXo9N1giHHPsUMQjV6APkVDkK9aNs-GQ/exec';
+  // The URL for your Netlify Function endpoint
+  // This will be relative to your site's root and point to the function file name
+  const netlifyFunctionURL = '/.netlify/functions/submit-waitlist';
 
   const signupForm = document.getElementById("signup-form");
   const msg = document.getElementById("response-msg");
 
-  if (signupForm && msg) { // Check if elements exist
+  if (signupForm && msg) {
     signupForm.addEventListener("submit", function (e) {
       e.preventDefault();
 
@@ -1041,31 +1041,38 @@ document.addEventListener("DOMContentLoaded", function() {
       msg.textContent = "Sending...";
       msg.style.color = "#444";
 
-      fetch(googleAppsScriptURL, {
+      // Collect form data
+      const formData = {
+        email: email,
+        country: country
+        // You can add other form fields here
+      };
+
+      fetch(netlifyFunctionURL, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json" // Sending JSON data
         },
-        body: JSON.stringify({
-          email: email,
-          country: country,
-          token: "sampath@123"
-        })
+        body: JSON.stringify(formData) // Send the data as a JSON string
       })
-      .then(res => res.json())
+      .then(response => {
+        // Netlify Functions will return a JSON response
+        return response.json();
+      })
       .then(data => {
         if (data.success) {
           msg.textContent = "✅ Thank you! You're on the waitlist.";
           msg.style.color = "green";
-          signupForm.reset(); // Use the cached signupForm reference
+          signupForm.reset(); // Clear the form
         } else {
-          msg.textContent = "❌ " + (data.message || "Something went wrong.");
+          // Display error message from the function, or a default
+          msg.textContent = "❌ " + (data.message || "Something went wrong with the submission.");
           msg.style.color = "red";
         }
       })
       .catch(err => {
         console.error("Fetch error:", err);
-        msg.textContent = "❌ Network error.";
+        msg.textContent = "❌ Network error or server issue.";
         msg.style.color = "red";
       });
     });
@@ -1073,11 +1080,7 @@ document.addEventListener("DOMContentLoaded", function() {
       console.error("Signup form or response message element not found.");
   }
 });
-
- 
 </script>
-
-
 
 
 
