@@ -1015,43 +1015,55 @@
             <p>&copy; 2025 Printify Check &nbsp;|&nbsp; AGPLv3 Open-Source &nbsp;|&nbsp; <a href="https://github.com/your-repo" target="_blank" rel="noopener noreferrer">View on GitHub</a></p> </div>
     </footer>
 
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
   const netlifyFunctionURL = 'https://join-waitlist.netlify.app/.netlify/functions/submit-waitlist';
   const signupForm = document.getElementById("signup-form");
   const msg = document.getElementById("response-msg");
+  const submitButton = signupForm.querySelector('button[type="submit"]'); // Get the submit button
 
   // Get CSS variable values
   const colorAccent = getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim();
   const colorDanger = getComputedStyle(document.documentElement).getPropertyValue('--color-danger').trim();
-  const colorPrimary = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim(); // Or --color-text-medium
+  const colorPrimary = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim();
 
-  if (signupForm && msg) {
+  if (signupForm && msg && submitButton) { // Ensure button is also found
     signupForm.addEventListener("submit", function (e) {
       e.preventDefault();
+      submitButton.disabled = true; // Disable button on submit
+      submitButton.style.opacity = '0.7'; // Optional: visual feedback for disabled
+      submitButton.textContent = 'Processing...'; // Optional: change button text
 
       const email = document.getElementById("email").value.trim();
       const country = document.getElementById("country").value;
-      const feedback = document.getElementById("feedback").value.trim(); // Get feedback value
+      const feedback = document.getElementById("feedback").value.trim();
 
-      if (!email || !country) { // Email and country are required
+      // Clear previous messages and styles
+      msg.textContent = "";
+      msg.style.backgroundColor = 'transparent';
+      msg.style.border = 'none';
+
+      if (!email || !country) {
         msg.textContent = "Please fill in your email and country.";
-        msg.style.color = colorDanger; // Use danger color variable
-        msg.style.backgroundColor = 'rgba(220, 38, 38, 0.1)'; // Light red background
+        msg.style.color = colorDanger;
+        msg.style.backgroundColor = 'rgba(220, 38, 38, 0.1)';
         msg.style.border = `1px solid ${colorDanger}`;
+        submitButton.disabled = false; // Re-enable button
+        submitButton.style.opacity = '1';
+        submitButton.textContent = 'Join Waitlist';
         return;
       }
 
-      msg.textContent = "Sending...";
-      msg.style.color = colorPrimary; // Use primary color for sending
-      msg.style.backgroundColor = 'rgba(30, 58, 138, 0.1)'; // Light primary background
+      msg.textContent = "Sending..."; // This will now be more reliably visible
+      msg.style.color = colorPrimary;
+      msg.style.backgroundColor = 'rgba(30, 58, 138, 0.1)';
       msg.style.border = `1px solid ${colorPrimary}`;
-
 
       const formData = {
         email: email,
         country: country,
-        feedback: feedback // Add feedback to form data
+        feedback: feedback
       };
 
       fetch(netlifyFunctionURL, {
@@ -1065,13 +1077,13 @@ document.addEventListener("DOMContentLoaded", function() {
       .then(data => {
         if (data.success) {
           msg.textContent = "✅ Thank you! You're on the waitlist.";
-          msg.style.color = colorAccent; // Use accent color variable
-          msg.style.backgroundColor = 'rgba(16, 185, 129, 0.1)'; // Light accent background
+          msg.style.color = colorAccent;
+          msg.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
           msg.style.border = `1px solid ${colorAccent}`;
-          signupForm.reset(); 
+          signupForm.reset();
         } else {
           msg.textContent = "❌ " + (data.message || "Something went wrong with the submission.");
-          msg.style.color = colorDanger; // Use danger color variable
+          msg.style.color = colorDanger;
           msg.style.backgroundColor = 'rgba(220, 38, 38, 0.1)';
           msg.style.border = `1px solid ${colorDanger}`;
         }
@@ -1079,16 +1091,23 @@ document.addEventListener("DOMContentLoaded", function() {
       .catch(err => {
         console.error("Fetch error:", err);
         msg.textContent = "❌ Network error or server issue.";
-        msg.style.color = colorDanger; // Use danger color variable
+        msg.style.color = colorDanger;
         msg.style.backgroundColor = 'rgba(220, 38, 38, 0.1)';
         msg.style.border = `1px solid ${colorDanger}`;
+      })
+      .finally(() => { // This block executes regardless of success or failure
+        submitButton.disabled = false; // Re-enable button
+        submitButton.style.opacity = '1';
+        submitButton.textContent = 'Join Waitlist'; // Reset button text
       });
     });
   } else {
-      console.error("Signup form or response message element not found.");
+      console.error("Signup form, response message element, or submit button not found.");
   }
 });
 </script>
+    
+
 
 </body>
 </html>
